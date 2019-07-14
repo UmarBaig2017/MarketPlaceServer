@@ -79,7 +79,10 @@ admin.auth().getUserByEmail('admin@gmail.com')
         })
     })
     .catch(function(error) {
-        res.send("something wrng");
+        res.json({
+            message: "Fail",
+
+        })
     });
   })
 app.put("/api/createUser",(req,res)=>{
@@ -1100,7 +1103,10 @@ client.on('connection', (socket) => {
 app.get("/api/allUsers",(req,res)=>{
     User.find({} , (err , sales)=>{
         if (err){
-            res.send("something wrng");
+            res.json({
+                message: "fail",
+    
+            })
         }
         res.json(sales)
        })
@@ -1108,7 +1114,10 @@ app.get("/api/allUsers",(req,res)=>{
 app.get("/api/AllListings",(req,res)=>{
     Listings.find({} , (err , sales)=>{
         if (err){
-            res.send("something wrng");
+            res.json({
+                message: "failed",
+    
+            })
         }
         res.json(sales)
        })
@@ -1116,7 +1125,10 @@ app.get("/api/AllListings",(req,res)=>{
 app.get("/api/AllSales",(req,res)=>{
     Orders.find({} , (err , sales)=>{
         if (err){
-            res.send("something wrng");
+            res.json({
+                message: "fail",
+    
+            })
         }
         res.json(sales)
        })
@@ -1125,7 +1137,10 @@ app.get("/api/AllSales",(req,res)=>{
 app.get("/api/AllCatigories",(req,res)=>{
     Category.find({} , (err , sales)=>{
         if (err){
-            res.send("something wrng");
+            res.json({
+                message: "failed",
+    
+            })
         }
         res.json(sales)
        })
@@ -1138,7 +1153,10 @@ app.get("/api/AllCatigories",(req,res)=>{
 app.post('/api/getOrders', (req, res) => {
     Orders.find({} , (err , sales)=>{
      if (err){
-         res.send("something wrng");
+        res.json({
+            message: "failed",
+
+        })
      }
      res.json(sales)
     })
