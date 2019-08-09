@@ -8,6 +8,10 @@ const UserSchema = new mongoose.Schema({
       type:String,
       rrequired:[true,'Full Name is required']
   },
+  status:{
+      type:String,
+     
+  },
   profilePic:{
       type:String
   },
@@ -17,7 +21,7 @@ const UserSchema = new mongoose.Schema({
   },
   isLoggedIn:{
       type:Boolean,
-      default:false
+      default:false 
   },
   createdDate:{
       type:Date,

@@ -15,6 +15,7 @@ const Category = require('./models/Categories')
 const Chats = require('./models/Chats')
 const Reports = require('./models/Reports')
 const PaymentInfo = require('./models/PaymentInfo')
+const ListingReport = require('./models/ListingReport')
 const Icons = require('./models/Icons')
 const stripe = require("stripe")(process.env.LIVE_KEY);
 const port = process.env.PORT || 5000
@@ -101,7 +102,6 @@ app.put("/api/createUser",(req,res)=>{
           console.log('Error creating new user:', error);
         });
 })
-
 
 
 
@@ -268,6 +268,16 @@ app.put('/api/fbLogin',(req,res)=>{
                 }
             })
         }
+    })
+})
+app.put('/api/logout', (req, res) => {
+    const {firebaseUID} = req.body
+    User.findOneAndUpdate({firebaseUID}, { isLoggedIn: false }, { new: true }, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: 'Success',
+            user: doc
+        })
     })
 })
 app.put('/api/logout', (req, res) => {
@@ -468,8 +478,44 @@ app.get('/api/getCategories',(req,res)=>{
         })
     })
 })
+app.get('/api/getReports',(req,res)=>{
+    Reports.find({},(err,docs)=>{
+        if(err)throw err
+        res.json({
+            message:"Success",
+            docs
+        })
+    })
+})
+app.get('/api/getListReports',(req,res)=>{
+    ListingReport.find({},(err,docs)=>{
+        if(err)throw err
+        res.json({
+            message:"Success",
+            docs
+        })
+    })
+})
 app.get('/api/getShippings:firebaseUID', (req, res) => {
     Shipping.find({ firebaseUID: req.params.firebaseUID }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+app.post('/api/getSpacShippings', (req, res) => {
+    Shipping.find({ firebaseUID: req.body.firebaseUID }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+app.post('/api/getActivity', (req, res) => {
+    Activity.find({ firebaseUID: req.body.firebaseUID }, (err, docs) => {
         if (err) res.json(err)
         res.json({
             message: "Success",
@@ -574,6 +620,18 @@ app.post('/api/addSubCategory', (req, res) => {
         })
     })
 })
+
+
+app.post('/api/UserStausUpdate', (req,res)=>{
+    User.findByIdAndUpdate(req.body.id, { $set: { status: req.body.status } }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+
 app.delete('/api/deleteCategory', (req, res) => {
     Category.findByIdAndRemove(req.body.id, (err, doc) => {
         if (err) res.json(err)
@@ -1017,6 +1075,14 @@ app.put('/api/searchListing', (req, res) => {
             res.json(docs)
         });
 })
+app.put('/api/searchReport', (req, res) => {
+    Listings.find({ $text: { $search: req.body.title } })
+        .limit(30)
+        .exec((err, docs) => {
+            if (err) throw err
+            res.json(docs)
+        });
+})
 client.on('connection', (socket) => {
     console.log('Client connected')
     // Create function to send status
@@ -1179,6 +1245,24 @@ app.post('/api/getOrders', (req, res) => {
         })
     })
  })
+ app.delete('/api/DeleteReportListing',(req,res)=>{
+    Listings.findByIdAndRemove(req.body.id, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: doc
+        })
+    })
+ })
+ app.delete('/api/DeleteReport',(req,res)=>{
+    ListingReport.findByIdAndRemove(req.body.id, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: doc
+        })
+    })
+ })
 
 
 
@@ -1270,6 +1354,7 @@ app.delete('/api/deleteActivityUserUID',(req,res)=>{
     })
  })
 
+
 app.delete('/api/deleteShippingUID',(req,res)=>{
     Shipping.findOneAndDelete(req.body.uid, (err, doc) => {
         if (err) res.json(err)
@@ -1292,6 +1377,44 @@ app.delete('/api/deletePaymentInfoUID',(req,res)=>{
 
 app.put('/api/deleteSubCategory', (req, res) => {
     Category.findByIdAndUpdate({ _id: req.body.id }, { $set: { subCategories: req.body.subCategories } }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+
+
+app.post('/api/UserStausUpdate', (req,res)=>{
+    User.findByIdAndUpdate(req.body.id, { $set: { status: req.body.status } }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+app.post('/api/updateSubCat', (req,res)=>{
+    Category.findByIdAndUpdate(req.body.id, { $set: { subCategories: req.body.subCategories } }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+
+app.post('/api/updateCat', (req, res) => {
+    console.log(req)
+    Category.findOneAndUpdate({ _id: req.body.id }, { $set: { 
+        subCategories: req.body.subCategories, 
+        name:  req.body.name,
+        color:  req.body.color,
+        iconType:  req.body.iconType,
+        iconName:  req.body.iconName,
+     } }, (err, docs) => {
+          
         if (err) res.json(err)
         res.json({
             message: "Success",
@@ -1375,6 +1498,7 @@ app.get('/api/getSearchedUsers',(req,res)=>{
     })
 })
 // 
+
 
 app.post('/api/getUsers:page', (req, res) => {
     const query = Object.assign({}, req.body)
