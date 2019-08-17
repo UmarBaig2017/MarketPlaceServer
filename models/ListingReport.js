@@ -20,6 +20,9 @@ const ListingReportSchema = new mongoose.Schema({
     sellerName: {
         type: String
     },
+    Action: {
+        type: String
+    },
     title: {
         type: String
     },
@@ -29,4 +32,6 @@ const ListingReportSchema = new mongoose.Schema({
         type:String
     },
 });
+ListingReportSchema.index({name:'text','title':"text"})
+ListingReportSchema.index({geometry:"2dsphere"});
 module.exports = mongoose.model('ReportListing', ListingReportSchema);

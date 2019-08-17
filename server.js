@@ -1076,8 +1076,7 @@ app.put('/api/searchListing', (req, res) => {
         });
 })
 app.put('/api/searchReport', (req, res) => {
-    Listings.find({ $text: { $search: req.body.title } })
-        .limit(30)
+    ListingReport.find({ $text: { $search: req.body.title } })
         .exec((err, docs) => {
             if (err) throw err
             res.json(docs)
@@ -1245,6 +1244,15 @@ app.post('/api/getOrders', (req, res) => {
         })
     })
  })
+ app.delete('/api/DeleteAllListings',(req,res)=>{
+    Listings.remove({firebaseUID: req.body.id}, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: doc
+        })
+    })
+ })
  app.delete('/api/DeleteReportListing',(req,res)=>{
     Listings.findByIdAndRemove(req.body.id, (err, doc) => {
         if (err) res.json(err)
@@ -1254,8 +1262,8 @@ app.post('/api/getOrders', (req, res) => {
         })
     })
  })
- app.delete('/api/DeleteReport',(req,res)=>{
-    ListingReport.findByIdAndRemove(req.body.id, (err, doc) => {
+ app.delete('/api/DeleteListingReport',(req,res)=>{
+    ListingReport.findOneAndDelete(req.body.id, (err, doc) => {
         if (err) res.json(err)
         res.json({
             message: "Success",
@@ -1344,6 +1352,15 @@ app.delete('/api/deleteUser',(req,res)=>{
         })
     })
  })
+app.delete('/api/deleteListingsUser',(req,res)=>{
+    User.findOneAndDelete(req.body.uid, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: doc
+        })
+    })
+ })
 app.delete('/api/deleteActivityUserUID',(req,res)=>{
     Activity.findOneAndDelete(req.body.uid, (err, doc) => {
         if (err) res.json(err)
@@ -1373,10 +1390,28 @@ app.delete('/api/deletePaymentInfoUID',(req,res)=>{
         })
     })
  })
+app.delete('/api/DeleteReport',(req,res)=>{
+    Reports.findOneAndDelete(req.body.id, (err, doc) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: doc
+        })
+    })
+ })
 
 
 app.put('/api/deleteSubCategory', (req, res) => {
     Category.findByIdAndUpdate({ _id: req.body.id }, { $set: { subCategories: req.body.subCategories } }, (err, docs) => {
+        if (err) res.json(err)
+        res.json({
+            message: "Success",
+            data: docs
+        })
+    })
+})
+app.put('/api/UpdateReportStatus', (req, res) => {
+    ListingReport.findByIdAndUpdate({ _id: req.body.id }, { $set: { Action: req.body.Action } }, (err, docs) => {
         if (err) res.json(err)
         res.json({
             message: "Success",
